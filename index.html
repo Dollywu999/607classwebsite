@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Untitled</title>
+  
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>607庚的可愛世界</title>
+    <style>
+        /* 基本樣式 */
+        body {
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #FFD6E7, #B6F2F2);
+            color: #555;
+        }
+
+        .container {
+            text-align: center;
+            padding: 50px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #FF6B6B;
+            text-shadow: 2px 2px 8px rgba(255, 255, 255, 0.8);
+        }
+
+        nav {
+            margin: 20px 0;
+        }
+
+        nav button {
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 30px;
+            background: #FFB6C1;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        nav button:hover {
+            transform: scale(1.1);
+            background: #FFA4B7;
+        }
+
+        .section {
+            margin: 20px 0;
+            display: none;
+        }
+
+        .countdown, .gallery, .message-board {
+            margin: 20px auto;
+            padding: 15px;
+            background: #FFF1F1;
+            border-radius: 10px;
+        }
+
+        .message-form textarea {
+            width: 100%;
+            height: 80px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .hidden-password {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hidden-password button {
+            padding: 10px;
+            border: none;
+            border-radius: 50%;
+            background: #FFB6C1;
+            color: white;
+            cursor: pointer;
+            box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .hidden-password input {
+            display: none;
+            padding: 10px;
+            border: 1px solid #FFB6C1;
+            border-radius: 5px;
+        }
+
+        .hidden-password input.show {
+            display: block;
+        }
+
+        .editable {
+            display: none;
+            margin: 10px 0;
+        }
+
+        .exit-edit {
+            display: none;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 1em;
+            background: #FFD700;
+            color: #555;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .exit-edit:hover {
+            background: #FFC107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>歡迎來到 607 的世界！</h1>
+        <nav>
+            <button onclick="showSection('countdown-section')">倒數計時</button>
+            <button onclick="showSection('gallery-section')">相片集</button>
+            <button onclick="showSection('message-board-section')">留言板</button>
+        </nav>
+
+        <!-- 倒數計時 -->
+        <div id="countdown-section" class="section countdown">
+            <h2 id="countdown-title">大日子的倒數計時：</h2>
+            <div id="countdown">載入中...</div>
+            <div class="editable">
+                <input id="edit-title" type="text" placeholder="輸入新的標題">
+                <input id="edit-date" type="datetime-local">
+                <button onclick="updateCountdown()">更新倒數</button>
+            </div>
+        </div>
+
+        <!-- 相片集 -->
+        <div id="gallery-section" class="section gallery">
+            <h2>班級相片集</h2>
+            <div id="photo-gallery"></div>
+            <div class="editable">
+                <input id="upload-photo" type="file" accept="image/*">
+                <button onclick="addPhoto()">新增圖片</button>
+            </div>
+        </div>
+
+        <!-- 留言板 -->
+        <div id="message-board-section" class="section message-board">
+            <h2>班級留言板</h2>
+            <div id="messages"></div>
+            <div class="message-form">
+                <textarea id="message-input" placeholder="寫下你的留言..."></textarea>
+                <button onclick="postMessage()">發佈留言</button>
+            </div>
+        </div>
+
+        <!-- 隱藏密碼 -->
+        <div class="hidden-password">
+            <button onclick="togglePasswordInput()">🔒</button>
+            <input id="password-input" type="password" placeholder="輸入密碼" />
+            <button id="confirm-button" style="display: none;" onclick="checkPassword()">確認</button>
+        </div>
+
+        <!-- 退出編輯模式 -->
+        <button id="exit-edit" class="exit-edit" onclick="exitEditMode()">退出編輯模式</button>
+    </div>
+
+    <script>
+        let isEditMode = false;
+        const sections = document.querySelectorAll('.section');
+        const password = "607happyforever";
+
+        function showSection(id) {
+            sections.forEach(section => section.style.display = 'none');
+            document.getElementById(id).style.display = 'block';
+        }
+
+        function togglePasswordInput() {
+            const input = document.getElementById('password-input');
+            const confirmButton = document.getElementById('confirm-button');
+            input.classList.toggle('show');
+            confirmButton.style.display = input.classList.contains('show') ? 'block' : 'none';
+        }
+
+        function checkPassword() {
+            const input = document.getElementById('password-input');
+            if (input.value === password) {
+                alert('成功進入編輯模式！');
+                isEditMode = true;
+                document.querySelectorAll('.editable').forEach(el => el.style.display = 'block');
+                document.getElementById('exit-edit').style.display = 'block';
+                togglePasswordInput();
+            } else {
+                alert('密碼錯誤！');
+            }
+        }
+
+        function exitEditMode() {
+            isEditMode = false;
+            alert('已退出編輯模式。');
+            document.querySelectorAll('.editable').forEach(el => el.style.display = 'none');
+            document.getElementById('exit-edit').style.display = 'none';
+        }
+
+        function showCountdown() {
+            const countdownElement = document.getElementById('countdown');
+            const eventDate = new Date('2025-01-01T00:00:00').getTime();
+
+            setInterval(() => {
+                const now = new Date().getTime();
+                const distance = eventDate - now;
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000)) / 1000);
+
+                countdownElement.textContent = `${days}天 ${hours}時 ${minutes}分 ${seconds}秒`;
+            }, 1000);
+        }
+
+        function updateCountdown() {
+            const newTitle = document.getElementById('edit-title').value;
+            const newDate = document.getElementById('edit-date').value;
+            if (newTitle) {
+                document.getElementById('countdown-title').textContent = newTitle;
+            }
+            if (newDate) {
+                alert('倒數日期已更新！刷新頁面查看新倒數。');
+            }
+        }
+
+        function addPhoto() {
+            const fileInput = document.getElementById('upload-photo');
+            if (fileInput.files.length) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.width = '150px';
+                    img.style.margin = '10px';
+                    img.onclick = () => img.remove();
+                    document.getElementById('photo-gallery').appendChild(img);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+
+        function postMessage() {
+            const messageInput = document.getElementById('message-input');
+            const messages = document.getElementById('messages');
+
+            if (messageInput.value.trim()) {
+                const newMessage = document.createElement('div');
+                newMessage.textContent = messageInput.value;
+                if (isEditMode) {
+                    newMessage.onclick = () => newMessage.remove();
+                }
+                messages.appendChild(newMessage);
+                messageInput.value = '';
+            }
+        }
+    </script>
+</body>
+</html>
+<!-- partial -->
+  <script src='https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js'></script>
+<script src='https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js'></script><script type="module" src="./script.js"></script>
+
+</body>
+</html>
